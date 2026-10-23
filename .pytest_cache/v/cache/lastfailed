@@ -1,0 +1,3 @@
+{
+  "tests/test_target.py::test_is_leap_year_invalid_types[2.5]": true
+}

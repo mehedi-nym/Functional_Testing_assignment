@@ -84,7 +84,7 @@ from target import invert
 @pytest.mark.parametrize(
     "flag, expected",
     [
-         (True, True),  # Intentionally incorrect for CI demonstration
+        (True, False),
         (False, True),
     ],
 )

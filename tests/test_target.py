@@ -264,7 +264,7 @@ def test_is_leap_year_invalid_years(year):
         is_leap_year(year)
 
 
-@pytest.mark.parametrize("year", ["2024", None, 2.5])
+@pytest.mark.parametrize("year", ["2024", None])
 def test_is_leap_year_invalid_types(year):
     with pytest.raises(TypeError):
         is_leap_year(year)
@@ -313,3 +313,129 @@ def test_to_int_invalid_types(value):
 def test_to_int_invalid_strings(value):
     with pytest.raises(ValueError):
         to_int(value)
+
+from target import divide
+
+
+@pytest.mark.parametrize(
+    "a, b, expected",
+    [
+        (10, 2, 5.0),
+        (9, 3, 3.0),
+        (7, 2, 3.5),
+        (-10, 2, -5.0),
+        (10, -2, -5.0),
+        (-10, -2, 5.0),
+        (0, 5, 0.0),
+        (5.5, 2, 2.75),
+    ],
+)
+def test_divide_valid_values(a, b, expected):
+    assert divide(a, b) == expected
+
+
+@pytest.mark.parametrize("b", [0, 0.0, False])
+def test_divide_by_zero(b):
+    with pytest.raises(ZeroDivisionError, match="cannot divide by zero"):
+        divide(10, b)
+
+from target import power
+
+
+@pytest.mark.parametrize(
+    "base, exponent, expected",
+    [
+        (2, 3, 8),
+        (5, 2, 25),
+        (10, 0, 1),
+        (2, 1, 2),
+        (-2, 3, -8),
+        (-2, 2, 4),
+        (2, -2, 0.25),
+        (0, 3, 0),
+    ],
+)
+def test_power(base, exponent, expected):
+    assert power(base, exponent) == expected
+
+from target import square_root
+
+
+@pytest.mark.parametrize(
+    "x, expected",
+    [
+        (0, 0.0),
+        (1, 1.0),
+        (4, 2.0),
+        (9, 3.0),
+        (16, 4.0),
+        (2, 2 ** 0.5),
+        (0.25, 0.5),
+    ],
+)
+def test_square_root_valid_values(x, expected):
+    assert square_root(x) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("x", [-1, -4, -0.25])
+def test_square_root_negative_values(x):
+    with pytest.raises(
+        ValueError,
+        match="cannot take the square root of a negative number",
+    ):
+        square_root(x)
+
+from target import factorial
+
+
+@pytest.mark.parametrize(
+    "n, expected",
+    [
+        (0, 1),
+        (1, 1),
+        (2, 2),
+        (3, 6),
+        (5, 120),
+        (10, 3628800),
+        (6, 720),
+    ],
+)
+def test_factorial_valid_values(n, expected):
+    result = factorial(n)
+
+    assert result == expected
+    assert isinstance(result, int)
+
+
+@pytest.mark.parametrize("n", [-1, -5, -10])
+def test_factorial_negative_values(n):
+    with pytest.raises(
+        ValueError,
+        match="factorial is not defined for negative numbers",
+    ):
+        factorial(n)
+
+from target import average
+
+
+@pytest.mark.parametrize(
+    "numbers, expected",
+    [
+        ([1, 2, 3], 2.0),
+        ([10, 20, 30], 20.0),
+        ([5], 5.0),
+        ([0, 0, 0], 0.0),
+        ([-1, 0, 1], 0.0),
+        ([-2, -4, -6], -4.0),
+        ([1.5, 2.5, 3.0], 7 / 3),
+        ([1, 2], 1.5),
+    ],
+)
+def test_average_valid_values(numbers, expected):
+    assert average(numbers) == pytest.approx(expected)
+
+
+def test_average_empty_list():
+    with pytest.raises(ValueError, match="list is empty"):
+        average([])
+

@@ -77,13 +77,14 @@ def test_count_vowels_invalid_type(invalid_text):
     match="text must be a string"):
         count_vowels(invalid_text)
 
+
 from target import invert
 
 
 @pytest.mark.parametrize(
     "flag, expected",
     [
-        (True, False),
+         (True, True),  # Intentionally incorrect for CI demonstration
         (False, True),
     ],
 )

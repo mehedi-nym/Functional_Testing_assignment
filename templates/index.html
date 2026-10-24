@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Functional Testing Playground</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px 16px;
+            font-family: Arial, sans-serif;
+            background: #f3f5f9;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 760px;
+            margin: 0 auto;
+            background: white;
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        label {
+            display: block;
+            margin: 22px 0 8px;
+            font-weight: bold;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: Consolas, monospace;
+        }
+
+        .description, .example {
+            margin-top: 8px;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        code {
+            overflow-wrap: anywhere;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 22px;
+            padding: 13px;
+            border: 0;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .output {
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+        }
+
+        .failure {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 14px 10px;
+            }
+
+            .container {
+                padding: 20px 16px;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h1>Functional Testing Playground</h1>
+        <p class="subtitle">
+            Select a Python function, enter its arguments, and view
+            the result or any error raised by the function.
+        </p>
+
+        <form method="POST">
+            <label for="function">Select Function</label>
+            <select id="function" name="function">
+                {% for name, details in functions.items() %}
+                <option value="{{ name }}"
+                    {% if name == selected_function %}selected{% endif %}>
+                    {{ name }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <p class="description" id="description"></p>
+
+            <label for="arguments">Arguments</label>
+            <textarea
+                id="arguments"
+                name="arguments"
+                required
+                spellcheck="false"
+            >{{ arguments }}</textarea>
+
+            <p class="example">
+                Enter arguments using Python tuple syntax.
+                Example: <code>(18,)</code> for one argument or
+                <code>(10, 2)</code> for two arguments.
+            </p>
+
+            <button type="submit">Run Function</button>
+        </form>
+
+        {% if result is not none %}
+        <section class="output success" aria-live="polite">
+            <strong>Result</strong>
+            <pre>{{ result }}</pre>
+        </section>
+        {% endif %}
+
+        {% if error %}
+        <section class="output failure" aria-live="polite">
+            <strong>Error</strong>
+            <pre>{{ error }}</pre>
+        </section>
+        {% endif %}
+    </main>
+
+    <script>
+        const functionDetails = {{ functions | tojson }};
+        const functionSelect = document.getElementById("function");
+        const argumentsInput = document.getElementById("arguments");
+        const description = document.getElementById("description");
+
+        function updateFunctionDetails(resetArguments) {
+            const selected = functionDetails[functionSelect.value];
+
+            description.textContent = selected.description;
+
+            if (resetArguments) {
+                argumentsInput.value = selected.example;
+            }
+        }
+
+        functionSelect.addEventListener("change", () => {
+            updateFunctionDetails(true);
+        });
+
+        updateFunctionDetails(false);
+    </script>
+</body>
+</html>

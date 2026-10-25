@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,197 +5,416 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Functional Testing Playground</title>
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
         * {
             box-sizing: border-box;
         }
 
         body {
             margin: 0;
-            padding: 30px 16px;
-            font-family: Arial, sans-serif;
-            background: #f3f5f9;
-            color: #1f2937;
+            padding: 40px 20px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
         }
 
         .container {
-            max-width: 760px;
+            max-width: 1100px;
             margin: 0 auto;
-            background: white;
-            padding: 28px;
-            border-radius: 14px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
         }
 
         h1 {
-            margin-top: 0;
-            font-size: 28px;
+            margin: 0 0 10px;
+            font-size: 32px;
+            color: #0f172a;
         }
 
         .subtitle {
-            color: #64748b;
-            line-height: 1.6;
+            color: var(--text-muted);
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* Card Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+            border-color: #cbd5e1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #0f172a;
+            font-family: Consolas, monospace;
+        }
+
+        .badge {
+            background: #e0e7ff;
+            color: #3730a3;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .card p {
+            margin: 0 0 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .card-action {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: white;
+            width: 100%;
+            max-width: 560px;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            transform: scale(0.95);
+            transition: transform 0.25s ease;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f1f5f9;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #e2e8f0;
+            color: var(--text);
+        }
+
+        .modal h2 {
+            margin: 0 0 8px;
+            font-size: 22px;
+            font-family: Consolas, monospace;
+        }
+
+        .modal .description {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
 
         label {
             display: block;
-            margin: 22px 0 8px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
         }
 
-        select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font: inherit;
+        .input-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .preset-btn {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text);
+            transition: background 0.2s;
+        }
+
+        .preset-btn:hover {
+            background: #e2e8f0;
         }
 
         textarea {
-            min-height: 100px;
-            resize: vertical;
-            font-family: Consolas, monospace;
-        }
-
-        .description, .example {
-            margin-top: 8px;
-            color: #64748b;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        code {
-            overflow-wrap: anywhere;
-        }
-
-        button {
             width: 100%;
-            margin-top: 22px;
-            padding: 13px;
-            border: 0;
+            padding: 12px;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            background: #2563eb;
+            font: inherit;
+            font-family: Consolas, monospace;
+            min-height: 90px;
+            resize: vertical;
+            background: #fdfdfd;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .example-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            margin-bottom: 20px;
+        }
+
+        .run-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
             color: white;
-            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
+            transition: background 0.2s;
         }
 
-        button:hover {
-            background: #1d4ed8;
+        .run-btn:hover {
+            background: var(--primary-hover);
         }
 
         .output {
-            margin-top: 24px;
-            padding: 16px;
+            margin-top: 20px;
+            padding: 14px;
             border-radius: 8px;
+            font-size: 14px;
             overflow-wrap: anywhere;
         }
 
         .success {
             background: #ecfdf5;
             border: 1px solid #a7f3d0;
+            color: #065f46;
         }
 
         .failure {
             background: #fef2f2;
             border: 1px solid #fecaca;
+            color: #991b1b;
         }
 
-        pre {
+        .output pre {
+            margin: 6px 0 0;
             white-space: pre-wrap;
-            overflow-wrap: anywhere;
-            margin-bottom: 0;
+            font-family: Consolas, monospace;
         }
 
-        @media (max-width: 480px) {
-            body {
-                padding: 14px 10px;
-            }
-
-            .container {
-                padding: 20px 16px;
-            }
-
-            h1 {
-                font-size: 23px;
+        @media (max-width: 640px) {
+            .grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <main class="container">
-        <h1>Functional Testing Playground</h1>
-        <p class="subtitle">
-            Select a Python function, enter its arguments, and view
-            the result or any error raised by the function.
-        </p>
-
-        <form method="POST">
-            <label for="function">Select Function</label>
-            <select id="function" name="function">
-                {% for name, details in functions.items() %}
-                <option value="{{ name }}"
-                    {% if name == selected_function %}selected{% endif %}>
-                    {{ name }}
-                </option>
-                {% endfor %}
-            </select>
-
-            <p class="description" id="description"></p>
-
-            <label for="arguments">Arguments</label>
-            <textarea
-                id="arguments"
-                name="arguments"
-                required
-                spellcheck="false"
-            >{{ arguments }}</textarea>
-
-            <p class="example">
-                Enter arguments using Python tuple syntax.
-                Example: <code>(18,)</code> for one argument or
-                <code>(10, 2)</code> for two arguments.
+    <div class="container">
+        <header>
+            <h1>Functional Testing Playground</h1>
+            <p class="subtitle">
+                Explore available Python functions as interactive cards. Click any card to test arguments and view results instantly.
             </p>
+        </header>
 
-            <button type="submit">Run Function</button>
-        </form>
+        <!-- Card Grid -->
+        <div class="grid">
+            {% for name, details in functions.items() %}
+            <div class="card" onclick="openModal('{{ name }}', '{{ details.description }}', '{{ details.example }}')">
+                <div class="card-header">
+                    <h3>{{ name }}()</h3>
+                    <span class="badge">Python</span>
+                </div>
+                <p>{{ details.description }}</p>
+                <div class="card-action">
+                    Test Function &rarr;
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 
-        {% if result is not none %}
-        <section class="output success" aria-live="polite">
-            <strong>Result</strong>
-            <pre>{{ result }}</pre>
-        </section>
-        {% endif %}
+    <!-- Modal Popup Template / Container -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2 id="modalTitle">function_name</h2>
+            <p class="description" id="modalDescription">Description goes here...</p>
 
-        {% if error %}
-        <section class="output failure" aria-live="polite">
-            <strong>Error</strong>
-            <pre>{{ error }}</pre>
-        </section>
-        {% endif %}
-    </main>
+            <form method="POST" id="testForm">
+                <input type="hidden" id="functionInput" name="function" value="">
+                
+                <div class="input-group-header">
+                    <label for="arguments">Arguments (Python Tuple)</label>
+                    <button type="button" class="preset-btn" id="presetBtn" onclick="loadPreset()">Load Preset Example</button>
+                </div>
+
+                <textarea id="arguments" name="arguments" required spellcheck="false"></textarea>
+                
+                <div class="example-hint">
+                    Example format: <code>(18,)</code> for single argument or <code>(10, 2)</code> for multiple arguments.
+                </div>
+
+                <button type="submit" class="run-btn">Run Function</button>
+            </form>
+
+            {% if result is not none %}
+            <div class="output success" id="resultOutput">
+                <strong>Result</strong>
+                <pre>{{ result }}</pre>
+            </div>
+            {% endif %}
+
+            {% if error %}
+            <div class="output failure" id="errorOutput">
+                <strong>Error</strong>
+                <pre>{{ error }}</pre>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 
     <script>
-        const functionDetails = {{ functions | tojson }};
-        const functionSelect = document.getElementById("function");
+        const modalOverlay = document.getElementById("modalOverlay");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalDescription = document.getElementById("modalDescription");
+        const functionInput = document.getElementById("functionInput");
         const argumentsInput = document.getElementById("arguments");
-        const description = document.getElementById("description");
 
-        function updateFunctionDetails(resetArguments) {
-            const selected = functionDetails[functionSelect.value];
+        // Keep track of current function's example preset
+        let currentExample = "";
 
-            description.textContent = selected.description;
-
-            if (resetArguments) {
-                argumentsInput.value = selected.example;
+        function openModal(name, description, example) {
+            modalTitle.textContent = name + "()";
+            modalDescription.textContent = description;
+            functionInput.value = name;
+            currentExample = example;
+            
+            // Only populate example if textarea is empty or switching functions fresh
+            if (!argumentsInput.value || functionInput.value !== "{{ selected_function }}") {
+                argumentsInput.value = example;
             }
+
+            modalOverlay.classList.add("active");
         }
 
-        functionSelect.addEventListener("change", () => {
-            updateFunctionDetails(true);
+        function closeModal() {
+            modalOverlay.classList.remove("active");
+            // Clear URL state or reset outputs if desired
+        }
+
+        function loadPreset() {
+            argumentsInput.value = currentExample;
+        }
+
+        // Close modal when clicking outside of it
+        modalOverlay.addEventListener("click", (e) => {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
         });
 
-        updateFunctionDetails(false);
+        // Auto-reopen modal if a test was just run (has result or error from backend)
+        {% if selected_function %}
+        window.addEventListener("DOMContentLoaded", () => {
+            const funcDetails = {{ functions | tojson }};
+            const selName = "{{ selected_function }}";
+            if (funcDetails[selName]) {
+                openModal(selName, funcDetails[selName].description, "{{ arguments | safe }}");
+            }
+        });
+        {% endif %}
     </script>
 </body>
 </html>

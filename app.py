@@ -77,12 +77,14 @@ FUNCTIONS = {
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    selected_function = "is_adult"
-    arguments = FUNCTIONS[selected_function]["example"]
+    selected_function = ""
+    arguments = ""
     result = None
     error = None
+    submitted = False
 
     if request.method == "POST":
+        submitted = True
         selected_function = request.form.get("function", "")
 
         if selected_function not in FUNCTIONS:
@@ -92,22 +94,21 @@ def index():
 
             try:
                 parsed_arguments = ast.literal_eval(arguments)
-
-                if not isinstance(parsed_arguments, tuple):
-                    raise TypeError(
-                        "Arguments must be entered as a Python tuple, "
-                        "for example: (18,)"
-                    )
-
-                function = getattr(target, selected_function)
-                output = function(*parsed_arguments)
-
-                result = repr(output)
-
             except (ValueError, SyntaxError) as exc:
                 error = f"Input error: {exc}"
-            except (TypeError, ZeroDivisionError, KeyError, OverflowError) as exc:
-                error = f"{type(exc).__name__}: {exc}"
+            else:
+                if not isinstance(parsed_arguments, tuple):
+                    error = (
+                        "TypeError: Arguments must be entered as a Python tuple, "
+                        "for example: (18,)"
+                    )
+                else:
+                    try:
+                        function = getattr(target, selected_function)
+                        output = function(*parsed_arguments)
+                        result = repr(output)
+                    except Exception as exc:
+                        error = f"{type(exc).__name__}: {exc}"
 
     return render_template(
         "index.html",
@@ -116,6 +117,7 @@ def index():
         arguments=arguments,
         result=result,
         error=error,
+        submitted=submitted,
     )
 
 

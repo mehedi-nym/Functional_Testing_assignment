@@ -107,7 +107,14 @@ def index():
                         function = getattr(target, selected_function)
                         output = function(*parsed_arguments)
                         result = repr(output)
-                    except Exception as exc:
+                    except (
+                        AttributeError,
+                        KeyError,
+                        OverflowError,
+                        TypeError,
+                        ValueError,
+                        ZeroDivisionError,
+                    ) as exc:
                         error = f"{type(exc).__name__}: {exc}"
 
     return render_template(

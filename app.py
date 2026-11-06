@@ -1,4 +1,4 @@
-
+import os
 import ast
 
 from flask import Flask, render_template, request
@@ -130,7 +130,10 @@ def index():
 
 @app.route("/health")
 def health():
-    return {"status": "ok"}, 200
+    return {
+        "status": "ok",
+        "commit": os.getenv("RENDER_GIT_COMMIT", "local")
+    }, 200
 
 
 if __name__ == "__main__":

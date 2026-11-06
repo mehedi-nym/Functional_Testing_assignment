@@ -1,6 +1,7 @@
 
-import pytest
 import os
+
+import pytest
 
 from app import app
 

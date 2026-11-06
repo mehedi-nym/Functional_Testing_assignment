@@ -1,5 +1,6 @@
 
 import pytest
+import os
 
 from app import app
 
@@ -98,4 +99,7 @@ def test_health_endpoint(client):
     response = client.get("/health")
 
     assert response.status_code == 200
-    assert response.get_json() == {"status": "ok"}
+    assert response.get_json() == {
+        "status": "ok",
+        "commit": os.getenv("RENDER_GIT_COMMIT", "local"),
+    }
